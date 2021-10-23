@@ -1,13 +1,19 @@
 {
-  "name": "rep-js",
+  "name": "vs-rep-js",
+  "publisher": "AndrewBeletskiy",
   "displayName": "REP.js",
   "description": "It reads js code. Evaluates it and prints the result below",
+  "author": {
+	  "email": "andrewbeletskiy@gmail.com",
+	  "name": "andrewbeletskiy",
+	  "url": "https://whiteand.github.io/personal/"
+  },
   "version": "1.0.0",
   "engines": {
     "vscode": "^1.61.0"
   },
   "categories": [
-    "Other",
+    "Other"
   ],
   "activationEvents": [
     "onCommand:rep-js.rep"
