@@ -2,6 +2,10 @@
 
 This is an extension for generation of code using js code.
 
+## Demo
+
+<img src="images/demo.gif"/>
+
 ## Features
 
 You can just write the code that will generate other code and call Eval and Print command of this extension and it will insder generated code right after the code of generator.
