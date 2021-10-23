@@ -8,7 +8,7 @@ This is an extension for generation of code using js code.
 
 ## Features
 
-You can just write the code that will generate other code and call Eval and Print command of this extension and it will insder generated code right after the code of generator.
+You can just write the code that will generate other code and call 'REP.js: Eval and Print' command of this extension and it will insder generated code right after the code of generator.
 
 Example:
 
@@ -22,7 +22,7 @@ for (let i = 0; i < 10; i++) {
 
 Select all these lines
 
-Run "Eval and Print" command
+Run "REP.js: Eval and Print" command
 
 Result:
 ```javascript

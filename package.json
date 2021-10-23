@@ -27,7 +27,7 @@
     "commands": [
       {
         "command": "rep-js.rep",
-        "title": "Eval and Print"
+        "title": "REP.js: Eval and Print"
       }
     ]
   },
