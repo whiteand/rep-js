@@ -112,7 +112,6 @@ export function activate(context: vscode.ExtensionContext) {
 
     try {
       const result = globalThis.eval(code);
-      vscode.window.showInformationMessage(result);
       editor.edit((editBuilder) => {
         editBuilder.insert(endLineEnd, `\n${result}`);
       });
