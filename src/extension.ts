@@ -1,6 +1,8 @@
 // The module 'vscode' contains the VS Code extensibility API
 // Import the module and reference it with the alias vscode in your code below
 import * as vscode from "vscode";
+import * as _ from "lodash";
+import * as R from "ramda";
 
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
@@ -27,91 +29,64 @@ export function activate(context: vscode.ExtensionContext) {
       vscode.window.showInformationMessage(`You should select js code`);
       return;
     }
-    const jsCodeToBeRun = `
-	    (function gen(window, globalThis, global) {
-			const _rep_result = [];
-			function write(text) {
-				_rep_result.push(text)
-			};
-			function writeline(...texts) {
-				for (const text of texts) {
-					write(texts.toString())
-					write('\\n')
-				}
-			};
-			function __comment(prefix, args) {
-				writeline('/* ' + prefix)
-				writeline(...args)
-				writeline('*/')
-			}
-			const console = {
-				log(...args) {
-					__comment('console.log', args)
-				}
-				error(...args) {
-					__comment('console.error', args)
-				}
-				warn(...args) {
-					__comment('console.warn', args)
-				}
-			}
-			;${selectionText};
-			return _rep_result.join('');
-		})(null, null, null)
-	`;
-    const code = `
-		(function(window, globalThis){
-			const _rep_result = [];
-			const __logs = []
-			function __flushLogs() {
-				const combined = []
-				let last = { prefix: null, args: [] }
-				for (const log of __logs) {
-					if (log.prefix === last.prefix) {
-						last.args.push('\\n   ',...log.args)
-					} else {
-						combined.push(log)
-						last = log
-					}
-				}
-				for (const log of combined) {
-					_rep_result.push('/* ' + log.prefix + '\\n')
-					_rep_result.push('   ', ...log.args)
-					_rep_result.push('\\n*/\\n')
-				}
-				__logs.splice(0)
-			}
-			function write(...text) {
-				__flushLogs()
-				_rep_result.push(...text)
-			};
-			function writeline(...text) {
-				__flushLogs()
-				write(...text)
-				write('\\n')
-			}
-			function __comment(prefix, ...args) {
-				__logs.push({ prefix, args })
-			}
-			const console = {
-				log: (...args) => {
-					__comment('log', ...args)
-				},
-				warn: (...args) => {
-					__comment('warn', ...args)
-				},
-				error: (...args) => {
-					__comment('error', ...args)
-				}
-			}
-			;${selectionText};
-			__flushLogs();
-			return _rep_result.join('')
-		})(null, null)
-	`.trim();
 
     try {
-      const result = globalThis.eval(code);
+      const f = new Function(
+        "R",
+        "_",
+        "window",
+        "globalThis",
+        "global",
+        `
+		  const _rep_result = [];
+				  const __logs = []
+				  function __flushLogs() {
+					  const combined = []
+					  let last = { prefix: null, args: [] }
+					  for (const log of __logs) {
+						  if (log.prefix === last.prefix) {
+							  last.args.push('\\n   ',...log.args)
+						  } else {
+							  combined.push(log)
+							  last = log
+						  }
+					  }
+					  for (const log of combined) {
+						  _rep_result.push('/* ' + log.prefix + '\\n')
+						  _rep_result.push('   ', ...log.args)
+						  _rep_result.push('\\n*/\\n')
+					  }
+					  __logs.splice(0)
+				  }
+				  function write(...text) {
+					  __flushLogs()
+					  _rep_result.push(...text)
+				  };
+				  function writeline(...text) {
+					  __flushLogs()
+					  write(...text)
+					  write('\\n')
+				  }
+				  function __comment(prefix, ...args) {
+					  __logs.push({ prefix, args })
+				  }
+				  const console = {
+					  log: (...args) => {
+						  __comment('log', ...args)
+					  },
+					  warn: (...args) => {
+						  __comment('warn', ...args)
+					  },
+					  error: (...args) => {
+						  __comment('error', ...args)
+					  }
+				  }
+				  ;${selectionText};
+				  __flushLogs();
+				  return _rep_result.join('')
+		  `.trim()
+      );
+      const result = f(R, _, null, null, null);
       editor.edit((editBuilder) => {
         editBuilder.insert(endLineEnd, `\n${result}`);
       });
